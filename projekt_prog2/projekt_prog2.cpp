@@ -102,12 +102,13 @@ public:
         {
             ship->Move_right(fElapsedTime);
         }
-        
+
         //Rysowanie obramowania
         for (int i = 0; i < 80; i++)
             for (int j = 0; j < 160; j++)
                 if (i == 0 || j == 0 || i == m_nScreenHeight - 1 || j == m_nScreenWidth - 1) Draw(j, i, L'#', 15);
                 else Draw(j, i, L' ', 0);
+
 
         //Rysowanie statku
         DrawTriangle(ship->Playerx1(),ship->Playery1(),ship->Playerx2(),ship->Playery2(),ship->Playerx3(),ship->Playery3(),L'#',14);
@@ -131,6 +132,8 @@ public:
                 wystrzelony = false;
             }
         }
+
+
         return true;
     }
 };

@@ -86,15 +86,13 @@ public:
     void Shootable_zmien() { this->shootable = false; }
     void Kosmitax_przesun(float where) 
     { 
-        this->x[0] += where;
-        this->x[1] += where+1;
-        this->x[2] += where+2;
+        for(int i = 0; i < 3; i++)
+            this->x[i] += where+i;
     }
     void Kosmitay_wdol(float where) 
     { 
-        this->y[0] += where;
-        this->y[1] += where;
-        this->y[2] += where;
+        for(int i = 0; i < 3; i++)
+            this->y[i] += where;
     }
 
     void Move(float fElapsedTime, bool left)
@@ -248,21 +246,19 @@ public:
         }
 
         //Pomoc przy kolizji
-
+        /*
         string1 = to_wstring(kosmita[5]->Kosmitax(2));
         DrawString(10, 21, string1, 15);
         string1 = to_wstring(kosmita[1]->Kosmitax(1));
         DrawString(10, 22, string1, 164);
         string1 = to_wstring(kosmita[1]->Kosmitax(2));
         DrawString(10, 23, string1, 15);
+        */
 
-        //Kolizja z kosmita
-        
+        //Kolizja kosmita
         for (int which = 0; which < 6; which++)
         {
-            for (int x = 0; x < 3; x++)
-                for (int y = 0; y < 3; y++)
-                    if ((pociskgracz->Pociskx() > kosmita[which]->Kosmitax(x) - 0.5 && pociskgracz->Pociskx() < kosmita[which]->Kosmitax(x) + 0.5) && pociskgracz->Pocisky() < kosmita[which]->Kosmitay(y) && kosmita[which]->Shootable() == true)
+                    if ((pociskgracz->Pociskx() >= kosmita[which]->Kosmitax(0) + 0.2f && pociskgracz->Pociskx() <= kosmita[which]->Kosmitax(2)+0.2f) && (pociskgracz->Pocisky() >= kosmita[which]->Kosmitay(0)+0.2f && pociskgracz->Pocisky() <= kosmita[which]->Kosmitay(2)+0.2f) && kosmita[which]->Shootable() == true)
                     {
                         pociskgracz->Pocisky(64.0f);
                         wystrzelony = false;
@@ -270,7 +266,10 @@ public:
                         kosmita[which]->Kosmitacolor(0);
                         kosmita[which]->Shootable_zmien();
                     }
+                    if (kosmita[which]->Kosmitay(0) >= ship->Playery1()) return false;
         }
+
+
 
         return true;
     }
@@ -288,4 +287,3 @@ int main()
     system("PAUSE");
     return 0;
 }
-

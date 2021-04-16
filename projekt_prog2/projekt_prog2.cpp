@@ -68,9 +68,9 @@ public:
         this->y = new float[3];
 
         for (int i = 0; i < 3; i++)
-            this->x[i] = i + 60.0f;
+            this->x[i] = 50.0f + lp*6 + i;
         for (int i = 0; i < 3; i++)
-            this->y[i] = 15.0f;
+            this->y[i] = 15.0f + i;
         znak = L'A';
         color = 164;
         shootable = true;
@@ -84,32 +84,30 @@ public:
     void Kosmitaznak(char znak) { this->znak = znak; }
     void Kosmitacolor(int color) { this->color = color; }
     void Shootable_zmien() { this->shootable = false; }
-    void Kosmitax_zmien(float where) 
+    void Kosmitax_przesun(float where) 
     { 
-        this->x[0] = where;
-        this->x[1] = where+1;
-        this->x[2] = where+2;
+        this->x[0] += where;
+        this->x[1] += where+1;
+        this->x[2] += where+2;
     }
-    void Kosmitay_zmien(float where) 
+    void Kosmitay_wdol(float where) 
     { 
-        this->y[0] = where;
-        this->y[1] = where + 1;
-        this->y[2] = where + 2;
+        this->y[0] += where;
+        this->y[1] += where;
+        this->y[2] += where;
     }
 
     void Move(float fElapsedTime, bool left)
     {
         if (left)
         {
-            this->x[0] -= 15.0f * fElapsedTime;
-            this->x[1] -= 15.0f * fElapsedTime;
-            this->x[2] -= 15.0f * fElapsedTime;
+            for(int i = 0; i < 3; i++)
+                this->x[i] -= 15.0f * fElapsedTime;
         }
         else
         {
-            this->x[0] += 15.0f * fElapsedTime;
-            this->x[1] += 15.0f * fElapsedTime;
-            this->x[2] += 15.0f * fElapsedTime;
+            for(int i = 0; i < 3; i++)
+                this->x[i] += 15.0f * fElapsedTime;
         }
     }
 };
@@ -153,13 +151,13 @@ private:
     Pocisk* pociskgracz;
     bool wystrzelony;
     bool ruchwlewo;
-    Kosmita *kosmita[3];
+    Kosmita *kosmita[6];
     wstring string1;
 public:
     Gra()
     {
-        for (int i = 0; i < 3; i++)
-            kosmita[i] = new Kosmita(i+1);
+        for (int i = 0; i < 6; i++)
+            kosmita[i] = new Kosmita(i);
         ruchwlewo = true;
         wystrzelony = false;
         ship = new Statek;
@@ -217,7 +215,7 @@ public:
         }
 
         //Rysowanie Kosmity
-        for (int which = 0; which < 3; which++)
+        for (int which = 0; which < 6; which++)
         {
             for (int x = 0; x < 3; x++)
                 for (int y = 0; y < 3; y++)
@@ -225,27 +223,42 @@ public:
                     else Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), kosmita[which]->Kosmitaznak(), kosmita[which]->Kosmitacolor());
         }
         
-        for (int which = 0; which < 3; which++)
+        //Ruch Kosmity
+        for (int which = 0; which < 6; which++)
         {
-            //kosmita[which].Move(fElapsedTime, ruchwlewo);
+            kosmita[which]->Move(fElapsedTime, ruchwlewo);
         }
 
-            if (kosmita[0]->Kosmitax(0) < 2.0f) ruchwlewo = false;
-            if (kosmita[2]->Kosmitax(2) > 106.0f) ruchwlewo = true;
-        
+        if (kosmita[0]->Kosmitax(0) < 1.5f)
+        {
+            for (int i = 0; i < 6; i++)
+                for (int y = 0; y < 3; y++)
+                    kosmita[i]->Kosmitay_wdol(1.0f);
+
+            ruchwlewo = false;
+        }
+            
+        if (kosmita[5]->Kosmitax(2) > 118.0f)
+        {
+            for (int i = 0; i < 6; i++)
+                for (int y = 0; y < 3; y++)
+                    kosmita[i]->Kosmitay_wdol(1.0f);
+
+            ruchwlewo = true;
+        }
 
         //Pomoc przy kolizji
 
-        string1 = to_wstring(kosmita[0]->Kosmitax(0));
+        string1 = to_wstring(kosmita[5]->Kosmitax(2));
         DrawString(10, 21, string1, 15);
-        string1 = to_wstring(kosmita[1]->Kosmitax(0));
+        string1 = to_wstring(kosmita[1]->Kosmitax(1));
         DrawString(10, 22, string1, 164);
-        string1 = to_wstring(kosmita[2]->Kosmitax(0));
+        string1 = to_wstring(kosmita[1]->Kosmitax(2));
         DrawString(10, 23, string1, 15);
 
         //Kolizja z kosmita
         
-        for (int which = 0; which < 3; which++)
+        for (int which = 0; which < 6; which++)
         {
             for (int x = 0; x < 3; x++)
                 for (int y = 0; y < 3; y++)
@@ -254,7 +267,7 @@ public:
                         pociskgracz->Pocisky(64.0f);
                         wystrzelony = false;
                         kosmita[which]->Kosmitaznak(' ');
-                        kosmita[which]->Kosmitacolor(123);
+                        kosmita[which]->Kosmitacolor(0);
                         kosmita[which]->Shootable_zmien();
                     }
         }

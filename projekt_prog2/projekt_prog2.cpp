@@ -59,8 +59,8 @@ class Kosmita
 {
 private:
     float *x,*y,*pomx,*pomy;
-    wchar_t znak, srodek;
-    int color, colorsrodek, szerokosc, wysokosc;
+    wchar_t znak, znak_srodek;
+    int color, color_srodek, szerokosc, wysokosc;
     bool shootable;
     wchar_t znaki[5] = {'M','O','W','A','R'};
 public:
@@ -72,10 +72,10 @@ public:
         this->pomy = new float[3];
         this->szerokosc = 4;
         this->wysokosc = 4;
-        this->srodek = L' ';
+        this->znak_srodek = L' ';
         this->znak = L'A';
         this->color = 164;
-        this->colorsrodek = 240;
+        this->color_srodek = 240;
         this->shootable = true;
 
         for (int i = 0; i < this->szerokosc; i++)
@@ -96,12 +96,12 @@ public:
     float Kosmitay(int which) { return this->y[which]; }
     float Wysokosc() { return this->wysokosc; }
     wchar_t Kosmitaznak() { return this->znak; }
-    wchar_t Kosmitaznak_sr() { return this->srodek; }
+    wchar_t Kosmitaznak_sr() { return this->znak_srodek; }
     int Kosmitacolor() { return this->color; }
-    int Kosmitacolor_sr() { return this->colorsrodek; }
+    int Kosmitacolor_sr() { return this->color_srodek; }
     bool Shootable() { return this->shootable; }
-    void Kosmitaznak(char znak) { this->znak = znak; this->srodek = znak; }
-    void Kosmitacolor(int color) { this->color = color; this->colorsrodek = color;}
+    void Kosmitaznak(char znak) { this->znak = znak; this->znak_srodek = znak; }
+    void Kosmitacolor(int color) { this->color = color; this->color_srodek = color;}
     void Shootable_zmien() { this->shootable = false; }
     void Shootable_zmien(bool which) { this->shootable = which; }
     void Kosmita_poczatek() 
@@ -112,7 +112,9 @@ public:
             this->y[i] = this->pomy[i];
         }
         this->znak = L'A';
+        this->znak_srodek = L' ';
         this->color = 164;
+        this->color_srodek = 240;
         this->shootable = true;
     }
     void Kosmitay_wdol(float where) 
@@ -267,7 +269,7 @@ public:
             ruchwlewo = false;
         }
             
-        if (kosmita[ile - 1]->Kosmitax(2) > 118.0f)
+        if (kosmita[ile - 1]->Kosmitax(3) > 118.0f)
         {
             for (int i = 0; i < ile; i++)
                 for (int y = 0; y < 3; y++)
@@ -299,13 +301,11 @@ public:
                         kosmita[which]->Shootable_zmien();
                         score += 100;
                     }
-                    /*
                     if (kosmita[0]->Shootable() == false && kosmita[1]->Shootable() == false && kosmita[2]->Shootable() == false && kosmita[3]->Shootable() == false && kosmita[4]->Shootable() == false && kosmita[5]->Shootable() == false)
                     {
                         for(int ktory = 0; ktory < 6; ktory++)
                             kosmita[ktory]->Kosmita_poczatek();
                     }
-                    */
         }
 
         //Punkty

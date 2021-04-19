@@ -2,6 +2,7 @@
 #include "olcConsoleGameEngine.h"
 #include <string>
 #include <vector>
+#include <cstdlib>
 
 using namespace std;
 
@@ -57,41 +58,66 @@ public:
 class Kosmita
 {
 private:
-    float *x,*y;
-    wchar_t znak;
-    int color;
+    float *x,*y,*pomx,*pomy;
+    wchar_t znak, srodek;
+    int color, colorsrodek, szerokosc, wysokosc;
     bool shootable;
+    wchar_t znaki[5] = {'M','O','W','A','R'};
 public:
     Kosmita(int lp)
     {
         this->x = new float[3];
+        this->pomx = new float[3];
         this->y = new float[3];
+        this->pomy = new float[3];
+        this->szerokosc = 4;
+        this->wysokosc = 4;
+        this->srodek = L' ';
+        this->znak = L'A';
+        this->color = 164;
+        this->colorsrodek = 240;
+        this->shootable = true;
 
-        for (int i = 0; i < 3; i++)
-            this->x[i] = 50.0f + lp*6 + i;
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < this->szerokosc; i++)
+        {
+            this->x[i] = 50.0f + lp * (this->szerokosc*2) + i;
+            this->pomx[i] = this->x[i];
+        }
+        for (int i = 0; i < this->wysokosc; i++)
+        {
             this->y[i] = 15.0f + i;
-        znak = L'A';
-        color = 164;
-        shootable = true;
+            this->pomy[i] = this->y[i];
+        }
+        
     }
 
     float Kosmitax(int which) { return this->x[which]; }
+    int Szerokosc() { return this->szerokosc; }
     float Kosmitay(int which) { return this->y[which]; }
+    float Wysokosc() { return this->wysokosc; }
     wchar_t Kosmitaznak() { return this->znak; }
+    wchar_t Kosmitaznak_sr() { return this->srodek; }
     int Kosmitacolor() { return this->color; }
+    int Kosmitacolor_sr() { return this->colorsrodek; }
     bool Shootable() { return this->shootable; }
-    void Kosmitaznak(char znak) { this->znak = znak; }
-    void Kosmitacolor(int color) { this->color = color; }
+    void Kosmitaznak(char znak) { this->znak = znak; this->srodek = znak; }
+    void Kosmitacolor(int color) { this->color = color; this->colorsrodek = color;}
     void Shootable_zmien() { this->shootable = false; }
-    void Kosmitax_przesun(float where) 
+    void Shootable_zmien(bool which) { this->shootable = which; }
+    void Kosmita_poczatek() 
     { 
-        for(int i = 0; i < 3; i++)
-            this->x[i] += where+i;
+        for (int i = 0; i < this->szerokosc; i++)
+        {
+            this->x[i] = this->pomx[i];
+            this->y[i] = this->pomy[i];
+        }
+        this->znak = L'A';
+        this->color = 164;
+        this->shootable = true;
     }
     void Kosmitay_wdol(float where) 
     { 
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < this->wysokosc; i++)
             this->y[i] += where;
     }
 
@@ -99,12 +125,12 @@ public:
     {
         if (left)
         {
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < this->szerokosc; i++)
                 this->x[i] -= 15.0f * fElapsedTime;
         }
         else
         {
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < this->szerokosc; i++)
                 this->x[i] += 15.0f * fElapsedTime;
         }
     }
@@ -150,16 +176,21 @@ private:
     bool wystrzelony;
     bool ruchwlewo;
     Kosmita *kosmita[6];
+    int score, ile;
+    wstring wscore;
     wstring string1;
 public:
     Gra()
     {
-        for (int i = 0; i < 6; i++)
+        ile = 6;
+        for (int i = 0; i < ile; i++)
             kosmita[i] = new Kosmita(i);
         ruchwlewo = true;
         wystrzelony = false;
         ship = new Statek;
         pociskgracz = new Pocisk;
+        score = 0;
+        wscore = L"Score: ";
     }
 
     virtual bool OnUserCreate()
@@ -213,32 +244,32 @@ public:
         }
 
         //Rysowanie Kosmity
-        for (int which = 0; which < 6; which++)
+        for (int which = 0; which < ile; which++)
         {
-            for (int x = 0; x < 3; x++)
-                for (int y = 0; y < 3; y++)
-                    if (x == 1 && y == 1) Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), L' ', 0);
+            for (int x = 0; x < kosmita[which]->Szerokosc(); x++)
+                for (int y = 0; y < kosmita[which]->Wysokosc(); y++)
+                    if ((x == 1 || x == 2) && (y == 1 || y == 2)) Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), kosmita[which]->Kosmitaznak_sr(), kosmita[which]->Kosmitacolor_sr());
                     else Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), kosmita[which]->Kosmitaznak(), kosmita[which]->Kosmitacolor());
         }
         
         //Ruch Kosmity
-        for (int which = 0; which < 6; which++)
+        for (int which = 0; which < ile; which++)
         {
             kosmita[which]->Move(fElapsedTime, ruchwlewo);
         }
 
         if (kosmita[0]->Kosmitax(0) < 1.5f)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < ile; i++)
                 for (int y = 0; y < 3; y++)
                     kosmita[i]->Kosmitay_wdol(1.0f);
 
             ruchwlewo = false;
         }
             
-        if (kosmita[5]->Kosmitax(2) > 118.0f)
+        if (kosmita[ile - 1]->Kosmitax(2) > 118.0f)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < ile; i++)
                 for (int y = 0; y < 3; y++)
                     kosmita[i]->Kosmitay_wdol(1.0f);
 
@@ -247,28 +278,39 @@ public:
 
         //Pomoc przy kolizji
         /*
-        string1 = to_wstring(kosmita[5]->Kosmitax(2));
+        string1 = to_wstring(kosmita[5]->Kosmitay(2));
         DrawString(10, 21, string1, 15);
-        string1 = to_wstring(kosmita[1]->Kosmitax(1));
+        string1 = to_wstring(kosmita[1]->Kosmitay(1));
         DrawString(10, 22, string1, 164);
-        string1 = to_wstring(kosmita[1]->Kosmitax(2));
+        string1 = to_wstring(kosmita[1]->Kosmitay(2));
         DrawString(10, 23, string1, 15);
         */
+        
 
         //Kolizja kosmita
-        for (int which = 0; which < 6; which++)
+        for (int which = 0; which < ile; which++)
         {
-                    if ((pociskgracz->Pociskx() >= kosmita[which]->Kosmitax(0) + 0.2f && pociskgracz->Pociskx() <= kosmita[which]->Kosmitax(2)+0.2f) && (pociskgracz->Pocisky() >= kosmita[which]->Kosmitay(0)+0.2f && pociskgracz->Pocisky() <= kosmita[which]->Kosmitay(2)+0.2f) && kosmita[which]->Shootable() == true)
+                    if ((pociskgracz->Pociskx() >= kosmita[which]->Kosmitax(0) + 0.5f && pociskgracz->Pociskx() <= kosmita[which]->Kosmitax(2)+0.5f) && (pociskgracz->Pocisky() >= kosmita[which]->Kosmitay(0)+0.5f && pociskgracz->Pocisky() <= kosmita[which]->Kosmitay(2)+0.5f) && kosmita[which]->Shootable() == true)
                     {
                         pociskgracz->Pocisky(64.0f);
                         wystrzelony = false;
                         kosmita[which]->Kosmitaznak(' ');
                         kosmita[which]->Kosmitacolor(0);
                         kosmita[which]->Shootable_zmien();
+                        score += 100;
                     }
-                    if (kosmita[which]->Kosmitay(0) >= ship->Playery1()) return false;
+                    /*
+                    if (kosmita[0]->Shootable() == false && kosmita[1]->Shootable() == false && kosmita[2]->Shootable() == false && kosmita[3]->Shootable() == false && kosmita[4]->Shootable() == false && kosmita[5]->Shootable() == false)
+                    {
+                        for(int ktory = 0; ktory < 6; ktory++)
+                            kosmita[ktory]->Kosmita_poczatek();
+                    }
+                    */
         }
 
+        //Punkty
+        DrawString(1, 1, wscore, 15);
+        DrawString(8, 1, to_wstring(score), 15);
 
 
         return true;

@@ -19,11 +19,11 @@ private:
 public:
     Statek()
     {
-        this->playerx1 = 60.0f;
+        this->playerx1 = 59.0f;
         this->playery1 = 65.0f;
-        this->playerx2 = 57.0f;
+        this->playerx2 = 56.0f;
         this->playery2 = 68.0f;
-        this->playerx3 = 63.0f;
+        this->playerx3 = 62.0f;
         this->playery3 = 68.0f;
         this->lifes = 3;
     }
@@ -80,12 +80,15 @@ public:
 
         for (int i = 0; i < this->szerokosc; i++)
         {
-            this->x[i] = 50.0f + lp * (this->szerokosc*2) + i;
+            if(lp/6 >= 1.0f)this->x[i] = 37.0f + (lp-6) * (this->szerokosc * 2) + i;
+            else this->x[i] = 37.0f + lp * (this->szerokosc * 2) + i;
+
             this->pomx[i] = this->x[i];
         }
         for (int i = 0; i < this->wysokosc; i++)
         {
-            this->y[i] = 15.0f + i;
+            if(lp/6 == 1.0f) this->y[i] = 15.0f + (this->wysokosc * 2) + i;
+            else this->y[i] = 15.0f + i;
             this->pomy[i] = this->y[i];
         }
         
@@ -104,6 +107,7 @@ public:
     void Kosmitacolor(int color) { this->color = color; this->color_srodek = color;}
     void Shootable_zmien() { this->shootable = false; }
     void Shootable_zmien(bool which) { this->shootable = which; }
+    
     void Kosmita_poczatek() 
     { 
         for (int i = 0; i < this->szerokosc; i++)
@@ -116,7 +120,8 @@ public:
         this->color = 164;
         this->color_srodek = 240;
         this->shootable = true;
-    }
+   }
+    
     void Kosmitay_wdol(float where) 
     { 
         for(int i = 0; i < this->wysokosc; i++)
@@ -177,14 +182,14 @@ private:
     Pocisk* pociskgracz;
     bool wystrzelony;
     bool ruchwlewo;
-    Kosmita *kosmita[6];
+    Kosmita *kosmita[12];
     int score, ile;
     wstring wscore;
     wstring string1;
 public:
     Gra()
     {
-        ile = 6;
+        ile = 12;
         for (int i = 0; i < ile; i++)
             kosmita[i] = new Kosmita(i);
         ruchwlewo = true;
@@ -279,32 +284,31 @@ public:
         }
 
         //Pomoc przy kolizji
-        /*
-        string1 = to_wstring(kosmita[5]->Kosmitay(2));
+        
+        string1 = to_wstring(kosmita[0]->Kosmitax(0));
         DrawString(10, 21, string1, 15);
-        string1 = to_wstring(kosmita[1]->Kosmitay(1));
+        string1 = to_wstring(pociskgracz->Pociskx());
         DrawString(10, 22, string1, 164);
-        string1 = to_wstring(kosmita[1]->Kosmitay(2));
-        DrawString(10, 23, string1, 15);
-        */
+        
         
 
         //Kolizja kosmita
         for (int which = 0; which < ile; which++)
         {
-                    if ((pociskgracz->Pociskx() >= kosmita[which]->Kosmitax(0) + 0.5f && pociskgracz->Pociskx() <= kosmita[which]->Kosmitax(2)+0.5f) && (pociskgracz->Pocisky() >= kosmita[which]->Kosmitay(0)+0.5f && pociskgracz->Pocisky() <= kosmita[which]->Kosmitay(2)+0.5f) && kosmita[which]->Shootable() == true)
+                    if ((pociskgracz->Pociskx() >= kosmita[which]->Kosmitax(0) - 1.0f && pociskgracz->Pociskx() <= kosmita[which]->Kosmitax(3)+ 1.0f ) && (pociskgracz->Pocisky() >= kosmita[which]->Kosmitay(0)+ 1.0f && pociskgracz->Pocisky() <= kosmita[which]->Kosmitay(3)+ 1.0f ) && kosmita[which]->Shootable() == true)
                     {
                         pociskgracz->Pocisky(64.0f);
                         wystrzelony = false;
-                        kosmita[which]->Kosmitaznak(' ');
-                        kosmita[which]->Kosmitacolor(0);
+                        kosmita[which]->Kosmitaznak(NULL);
+                        kosmita[which]->Kosmitacolor(NULL);
                         kosmita[which]->Shootable_zmien();
                         score += 100;
                     }
                     if (kosmita[0]->Shootable() == false && kosmita[1]->Shootable() == false && kosmita[2]->Shootable() == false && kosmita[3]->Shootable() == false && kosmita[4]->Shootable() == false && kosmita[5]->Shootable() == false)
                     {
-                        for(int ktory = 0; ktory < 6; ktory++)
+                        for(int ktory = 0; ktory < ile; ktory++)
                             kosmita[ktory]->Kosmita_poczatek();
+                            ruchwlewo = true;
                     }
         }
 

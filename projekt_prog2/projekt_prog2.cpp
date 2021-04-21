@@ -63,8 +63,9 @@ private:
     int color, color_srodek, szerokosc, wysokosc;
     bool shootable;
     wchar_t znaki[5] = {'M','O','W','A','R'};
+    static int ile;
 public:
-    Kosmita(int lp)
+    Kosmita(int lp, char znaczek)
     {
         this->x = new float[3];
         this->pomx = new float[3];
@@ -73,10 +74,11 @@ public:
         this->szerokosc = 4;
         this->wysokosc = 4;
         this->znak_srodek = L' ';
-        this->znak = L'A';
+        this->znak = znaczek;
         this->color = 164;
         this->color_srodek = 240;
         this->shootable = true;
+        ile++;
 
         for (int i = 0; i < this->szerokosc; i++)
         {
@@ -103,6 +105,7 @@ public:
     int Kosmitacolor() { return this->color; }
     int Kosmitacolor_sr() { return this->color_srodek; }
     bool Shootable() { return this->shootable; }
+
     void Kosmitaznak(char znak) { this->znak = znak; this->znak_srodek = znak; }
     void Kosmitacolor(int color) { this->color = color; this->color_srodek = color;}
     void Shootable_zmien() { this->shootable = false; }
@@ -142,6 +145,8 @@ public:
         }
     }
 };
+
+int Kosmita::ile = 0;
 
 class Pocisk
 {
@@ -186,12 +191,18 @@ private:
     int score, ile;
     wstring wscore;
     wstring string1;
+    char znaki_kosmita[5] = { 'M','O','W','A','R' };
+    int randomowa;
 public:
     Gra()
     {
+        srand(time(NULL));
         ile = 12;
         for (int i = 0; i < ile; i++)
-            kosmita[i] = new Kosmita(i);
+        {
+            randomowa = rand() % 5 + 0;
+            kosmita[i] = new Kosmita(i, znaki_kosmita[randomowa]);
+        }
         ruchwlewo = true;
         wystrzelony = false;
         ship = new Statek;
@@ -262,7 +273,7 @@ public:
         //Ruch Kosmity
         for (int which = 0; which < ile; which++)
         {
-            kosmita[which]->Move(fElapsedTime, ruchwlewo);
+           kosmita[which]->Move(fElapsedTime, ruchwlewo);
         }
 
         if (kosmita[0]->Kosmitax(0) < 1.5f)
@@ -284,12 +295,12 @@ public:
         }
 
         //Pomoc przy kolizji
-        
+        /*
         string1 = to_wstring(kosmita[0]->Kosmitax(0));
         DrawString(10, 21, string1, 15);
         string1 = to_wstring(pociskgracz->Pociskx());
         DrawString(10, 22, string1, 164);
-        
+        */
         
 
         //Kolizja kosmita
@@ -315,7 +326,6 @@ public:
         //Punkty
         DrawString(1, 1, wscore, 15);
         DrawString(8, 1, to_wstring(score), 15);
-
 
         return true;
     }

@@ -139,11 +139,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Kosmita.cpp" />
+    <ClCompile Include="Pocisk.cpp" />
     <ClCompile Include="projekt_prog2.cpp" />
+    <ClCompile Include="Statek.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dodatkowe.h" />
+    <ClInclude Include="Kosmita.h" />
     <ClInclude Include="olcConsoleGameEngine.h" />
+    <ClInclude Include="Pocisk.h" />
+    <ClInclude Include="Statek.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

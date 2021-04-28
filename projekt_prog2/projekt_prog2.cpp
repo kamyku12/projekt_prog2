@@ -1,182 +1,11 @@
 ﻿#include <iostream>
 #include "olcConsoleGameEngine.h"
-#include <string>
-#include <vector>
 #include <cstdlib>
+#include "Statek.h"
+#include "Kosmita.h"
+#include "Pocisk.h"
 
 using namespace std;
-
-class Statek
-{
-private:
-    float playerx1;
-    float playery1;
-    float playerx2;
-    float playery2;
-    float playerx3;
-    float playery3;
-    int lifes;
-public:
-    Statek()
-    {
-        this->playerx1 = 59.0f;
-        this->playery1 = 65.0f;
-        this->playerx2 = 56.0f;
-        this->playery2 = 68.0f;
-        this->playerx3 = 62.0f;
-        this->playery3 = 68.0f;
-        this->lifes = 3;
-    }
-
-    void Move_left(float fElapsedTime)
-    {
-        if (playerx2 > 2.0f)
-        {
-            this->playerx1 -= 35.0f * fElapsedTime;
-            this->playerx2 -= 35.0f * fElapsedTime;
-            this->playerx3 -= 35.0f * fElapsedTime;
-        }
-    }
-
-    void Move_right(float fElapsedTime)
-    {
-        if (playerx3 < 118.0f)
-        {
-            this->playerx1 += 35.0f * fElapsedTime;
-            this->playerx2 += 35.0f * fElapsedTime;
-            this->playerx3 += 35.0f * fElapsedTime;
-        }
-    }
-    float Playerx1() { return this->playerx1; }
-    float Playerx2() { return this->playerx2; }
-    float Playerx3() { return this->playerx3; }
-    float Playery1() { return this->playery1; }
-    float Playery2() { return this->playery2; }
-    float Playery3() { return this->playery3; }
-};
-
-class Kosmita
-{
-private:
-    float *x,*y,*pomx,*pomy;
-    wchar_t znak, znak_srodek;
-    int color, color_srodek, szerokosc, wysokosc;
-    bool shootable;
-    wchar_t znaki[5] = {'M','O','W','A','R'};
-    static int ile;
-public:
-    Kosmita(int lp, char znaczek)
-    {
-        this->szerokosc = 4;
-        this->wysokosc = 4;
-        this->x = new float[szerokosc];
-        this->pomx = new float[szerokosc];
-        this->y = new float[wysokosc];
-        this->pomy = new float[wysokosc];
-        this->znak_srodek = L' ';
-        this->znak = znaczek;
-        this->color = 164;
-        this->color_srodek = 240;
-        this->shootable = true;
-        ile++;
-
-        for (int i = 0; i < this->szerokosc; i++)
-        {
-            if(lp/6 >= 1.0f)this->x[i] = 37.0f + (lp-6) * (this->szerokosc * 2) + i;
-            else this->x[i] = 37.0f + lp * (this->szerokosc * 2) + i;
-
-            this->pomx[i] = this->x[i];
-        }
-        for (int i = 0; i < this->wysokosc; i++)
-        {
-            if(lp/6 == 1.0f) this->y[i] = 15.0f + (this->wysokosc * 2) + i;
-            else this->y[i] = 15.0f + i;
-            this->pomy[i] = this->y[i];
-        }
-        
-    }
-
-    float Kosmitax(int which) { return this->x[which]; }
-    int Szerokosc() { return this->szerokosc; }
-    float Kosmitay(int which) { return this->y[which]; }
-    float Wysokosc() { return this->wysokosc; }
-    wchar_t Kosmitaznak() { return this->znak; }
-    wchar_t Kosmitaznak_sr() { return this->znak_srodek; }
-    int Kosmitacolor() { return this->color; }
-    int Kosmitacolor_sr() { return this->color_srodek; }
-    bool Shootable() { return this->shootable; }
-
-    void Kosmitaznak(char znak) { this->znak = znak; this->znak_srodek = znak; }
-    void Kosmitacolor(int color) { this->color = color; this->color_srodek = color;}
-    void Shootable_zmien() { this->shootable = false; }
-    
-    void Kosmita_poczatek() 
-    { 
-        for (int i = 0; i < this->szerokosc; i++)
-        {
-            this->x[i] = this->pomx[i];
-            this->y[i] = this->pomy[i];
-        }
-        this->znak = L'A';
-        this->znak_srodek = L' ';
-        this->color = 164;
-        this->color_srodek = 240;
-        this->shootable = true;
-   }
-    
-    void Kosmitay_wdol(float where) 
-    { 
-        for(int i = 0; i < this->wysokosc; i++)
-            this->y[i] += where;
-    }
-
-    void Move(float fElapsedTime, bool left)
-    {
-        if (left)
-        {
-            for(int i = 0; i < this->szerokosc; i++)
-                this->x[i] -= 15.0f * fElapsedTime;
-        }
-        else
-        {
-            for(int i = 0; i < this->szerokosc; i++)
-                this->x[i] += 15.0f * fElapsedTime;
-        }
-    }
-};
-
-int Kosmita::ile = 0;
-
-class Pocisk
-{
-private:
-    float pocisky, pociskx;
-    bool up;
-public:
-    Pocisk()
-    {
-        this->pocisky = 64.0f;
-        this->pociskx = 0.0f;
-        this->up = true;
-    }
-
-    void Move_up(float fElapsedTime)
-    {
-        this->up = true;
-        if (this->up == true && this->pocisky > 2.0f) this->pocisky -= 50.0f * fElapsedTime;
-    }
-
-    void Move_down(float fElapsedTime)
-    {
-        this->up = false;
-        if (this->up == false) this->pocisky += 50.0f * fElapsedTime;
-    }
-
-    float Pociskx() { return this->pociskx; }
-    float Pocisky() { return this->pocisky; }
-    void Pociskx(float x) { this->pociskx = x; }
-    void Pocisky(float y) { this->pocisky = y; }
-};
 
 
 class Gra : public olcConsoleGameEngine
@@ -333,7 +162,7 @@ public:
 
             Draw(pociskgracz->Pociskx(), pociskgracz->Pocisky(), L'O', 15);
             pociskgracz->Move_up(fElapsedTime);
-            if (pociskgracz->Pocisky() <= 2.0f)
+            if (pociskgracz->Pocisky() <= 2.0f || (pociskgracz->Pociskx() >= 100.0f && pociskgracz->Pocisky() <= 10.0f))
             {
                 pociskgracz->Pocisky(64.0f);
                 pociskgracz->Pociskx(ship->Playerx1());

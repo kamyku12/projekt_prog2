@@ -20,6 +20,13 @@ void Statek::Move_right(float fElapsedTime)
     }
 }
 
+void Statek::Life_minus()
+{
+    this->lifes = this->lifes - 1;
+}
+
+
+int Statek::Lifes() { return this->lifes; }
 float Statek::Playerx1() { return this->playerx1; }
 float Statek::Playerx2() { return this->playerx2; }
 float Statek::Playerx3() { return this->playerx3; }

@@ -1,6 +1,7 @@
 #pragma once
+#include "Pocisk.h"
 
-class Statek
+class Statek :public Pocisk
 {
 private:
     float playerx1;
@@ -10,6 +11,7 @@ private:
     float playerx3;
     float playery3;
     int lifes;
+    Pocisk* pociskgracz;
 public:
     Statek()
     {
@@ -20,10 +22,14 @@ public:
         this->playerx3 = 62.0f;
         this->playery3 = 68.0f;
         this->lifes = 3;
+        this->pociskgracz = new Pocisk;
     }
 
     void Move_left(float fElapsedTime);
     void Move_right(float fElapsedTime);
+    void Life_minus();
+
+    int Lifes();
     float Playerx1();
     float Playerx2();
     float Playerx3();

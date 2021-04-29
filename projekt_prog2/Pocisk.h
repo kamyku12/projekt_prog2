@@ -8,7 +8,7 @@ private:
 public:
     Pocisk()
     {
-        this->pocisky = 64.0f;
+        this->pocisky = 0.0f;
         this->pociskx = 0.0f;
         this->up = true;
     }

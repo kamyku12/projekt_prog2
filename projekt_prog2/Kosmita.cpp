@@ -34,16 +34,16 @@ void Kosmita::Kosmitay_wdol(float where)
         this->y[i] += where;
 }
 
-void Kosmita::Move(float fElapsedTime, bool left)
+void Kosmita::Move(float fElapsedTime, bool left, int level)
 {
     if (left)
     {
         for (int i = 0; i < this->szerokosc; i++)
-            this->x[i] -= 15.0f * fElapsedTime;
+            this->x[i] -= 15.0f * (1 + 0.20*(level-1)) * fElapsedTime;
     }
     else
     {
         for (int i = 0; i < this->szerokosc; i++)
-            this->x[i] += 15.0f * fElapsedTime;
+            this->x[i] += 15.0f * (1 + 0.20 * (level - 1)) * fElapsedTime;
     }
 }

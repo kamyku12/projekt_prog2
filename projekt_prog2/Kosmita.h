@@ -1,6 +1,7 @@
 #pragma once
+#include "Pocisk.h"
 
-class Kosmita
+class Kosmita : public Pocisk
 {
 private:
     float* x, * y, * pomx, * pomy;
@@ -8,6 +9,7 @@ private:
     int color, color_srodek, szerokosc, wysokosc;
     bool shootable;
     wchar_t znaki[5] = { 'M','O','W','A','R' };
+    Pocisk* pociskkosmita;
 public:
     Kosmita(int lp, char znaczek)
     {
@@ -22,6 +24,7 @@ public:
         this->color = 164;
         this->color_srodek = 240;
         this->shootable = true;
+        this->pociskkosmita = new Pocisk;
 
         for (int i = 0; i < this->szerokosc; i++)
         {
@@ -57,6 +60,6 @@ public:
 
     void Kosmitay_wdol(float where);
 
-    void Move(float fElapsedTime, bool left);
+    void Move(float fElapsedTime, bool left, int level);
 };
 

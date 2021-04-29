@@ -5,7 +5,7 @@ class Kosmita : public Pocisk
 {
 private:
     float* x, * y, * pomx, * pomy;
-    wchar_t znak, znak_srodek;
+    wchar_t znak, znak_srodek, znak_pocz;
     int color, color_srodek, szerokosc, wysokosc;
     bool shootable;
     wchar_t znaki[5] = { 'M','O','W','A','R' };
@@ -21,6 +21,7 @@ public:
         this->pomy = new float[wysokosc];
         this->znak_srodek = L' ';
         this->znak = znaczek;
+        this->znak_pocz = znaczek;
         this->color = 164;
         this->color_srodek = 240;
         this->shootable = true;

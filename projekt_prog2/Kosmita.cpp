@@ -21,7 +21,7 @@ void Kosmita::Kosmita_poczatek()
         this->x[i] = this->pomx[i];
         this->y[i] = this->pomy[i];
     }
-    this->znak = L'A';
+    this->znak = this->znak_pocz;
     this->znak_srodek = L' ';
     this->color = 164;
     this->color_srodek = 240;

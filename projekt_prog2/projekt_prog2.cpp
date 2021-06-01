@@ -17,7 +17,9 @@ private:
     int score, ile;
     wstring wscore, wlevel, wzycia ,string1;
     char znaki_kosmita[5] = { 'M','O','W','A','R' };
-    int randomowa, level, trafionych;
+    int randomowa, randomowa2, level, trafionych;
+    chrono::duration<float> elaps;
+    chrono::system_clock::time_point cp1, cp2;
 public:
     Gra()
     {
@@ -26,7 +28,8 @@ public:
         for (int i = 0; i < ile; i++)
         {
             randomowa = rand() % 5 + 0;
-            kosmita[i] = new Kosmita(i, znaki_kosmita[randomowa]);
+            randomowa2 = rand() % 5 + 1;
+            kosmita[i] = new Kosmita(i, znaki_kosmita[randomowa], randomowa2);
         }
         ruchwlewo = true;
         wystrzelony = false;
@@ -37,17 +40,35 @@ public:
         wlevel = L"Level: ";
         wzycia = L"Lifes: ";
         trafionych = 0;
+        cp1 = chrono::system_clock::now();
+        cp2 = chrono::system_clock::now();
     }
 
-    virtual bool OnUserCreate()
+    ~Gra()
+    {
+        delete ship;
+        for (int i = 0; i < 12; i++)
+            delete kosmita[i];
+    }
+
+    bool OnUserCreate()
     {
         
         
         return true;
     }
 
-    virtual bool OnUserUpdate(float fElapsedTime)
+    bool OnUserUpdate(float fElapsedTime)
     {
+        //Zliczenie ile czasu trwa gra, glownie uzywany do wystrzalu kosmity
+        cp2 = chrono::system_clock::now();
+        elaps = elaps + (cp2 - cp1);
+        cp1 = cp2;
+        if (elaps.count() > 6) elaps = elaps.zero();
+        float elaps2 = elaps.count();
+        
+
+
         //Ruch statku
         if (m_keys[VK_LEFT].bHeld)
         {
@@ -96,8 +117,9 @@ public:
         {
             for (int x = 0; x < kosmita[which]->Szerokosc(); x++)
                 for (int y = 0; y < kosmita[which]->Wysokosc(); y++)
-                    if ((x == 1 || x == 2) && (y == 1 || y == 2)) Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), kosmita[which]->Kosmitaznak_sr(), kosmita[which]->Kosmitacolor_sr());
+                    if ((x >= 1 && x <= 3) && (y >=1 && y <= 3)) Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), kosmita[which]->Kosmitaznak_sr(), kosmita[which]->Kosmitacolor_sr());
                     else Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), kosmita[which]->Kosmitaznak(), kosmita[which]->Kosmitacolor());
+
         }
         //-------------------------------------------
         
@@ -126,17 +148,11 @@ public:
         }
         //-------------------------------------------
 
-        //Pomoc przy kolizji
-        
-        string1 = to_wstring(ship->Pocisky());
-        DrawString(10, 21, string1, 15);
-        string1 = to_wstring(ship->Pociskx());
-        DrawString(10, 22, string1, 164);
 
         //Kolizja pocisku z kosmita
         for (int which = 0; which < ile; which++)
         {
-                    if ((ship->Pociskx() >= kosmita[which]->Kosmitax(0) - 1.0f && ship->Pociskx() <= kosmita[which]->Kosmitax(3)+ 1.0f ) && (ship->Pocisky() >= kosmita[which]->Kosmitay(0)+ 1.0f && ship->Pocisky() <= kosmita[which]->Kosmitay(3)+ 1.0f ) && kosmita[which]->Shootable() == true)
+                    if ((ship->Pociskx() >= kosmita[which]->Kosmitax(0) - 1.0f && ship->Pociskx() <= kosmita[which]->Kosmitax(4)+ 1.0f ) && (ship->Pocisky() >= kosmita[which]->Kosmitay(0)+ 1.0f && ship->Pocisky() <= kosmita[which]->Kosmitay(4)+ 1.0f ) && kosmita[which]->Shootable() == true)
                     {
                         ship->Pocisky(0.0f);
                         wystrzelony = false;
@@ -195,6 +211,31 @@ public:
         }
         //-------------------------------------------
         
+        //Wystrzal kosmity
+        for (int which = 0; which < ile; which++)
+        {
+            if (kosmita[which]->Shootable() == true && kosmita[which]->Shoot(elaps2) && kosmita[which]->wystrzelony() == false)
+            {
+                kosmita[which]->wystrzelony(true);
+                kosmita[which]->Pociskx(kosmita[which]->Kosmitax(2));
+                kosmita[which]->Pocisky(kosmita[which]->Kosmitay(2));
+            }
+        }
+        for (int which = 0; which < ile; which++)
+        {
+            if (kosmita[which]->wystrzelony() == true)
+            {
+                Draw(kosmita[which]->Pociskx(), kosmita[which]->Pocisky(), L'O', 5);
+                kosmita[which]->Move_down(fElapsedTime/2);
+                if (kosmita[which]->Pocisky() >= 69.0f)
+                {
+                    kosmita[which]->wystrzelony(false);
+                    kosmita[which]->Pociskx(kosmita[which]->Kosmitax(2));
+                    kosmita[which]->Pocisky(kosmita[which]->Kosmitay(2));
+                    
+                }
+            }
+        }
 
         //Rysowanie obramowania
         for (int i = 0; i < 70; i++)
@@ -203,14 +244,14 @@ public:
         //-------------------------------------------
 
 
-        //Jesli nie masz juz zyc, przegrywasz
+        //Jesli nie masz zyc, przegrywasz
         if (ship->Lifes() == 0)
         {
             for (int i = 0; i < 70; i++)
                 for (int j = 0; j < 120; j++)
                     Draw(j, i, L' ', 0);
 
-            DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2, L"Przegrałeś, nacisnij aby zakonczyc", 15);
+            DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2, L"Przegrałeś, nacisnij dowolny przycisk aby zakonczyc", 15);
 
             return false;
         }
@@ -225,9 +266,20 @@ public:
             DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2, L"Gratulacje, wygrałeś", 15);
             DrawString(m_nScreenWidth / 2 - 17 + 1, m_nScreenHeight / 2 + 1, L"Zdobyte punkty: ", 15);
             DrawString(m_nScreenWidth / 2 + 1, m_nScreenHeight / 2 + 1, to_wstring(score), 15);
+            DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2 + 2, L"Nacisnij dowolny przycisk aby zakończyć", 15);
 
             return false;
         }
+
+        
+
+        //Pomoc przy kolizji
+        string1 = to_wstring(elaps2);
+        DrawString(10, 21, string1, 15);
+        string1 = to_wstring(kosmita[0]->Pocisky());
+        DrawString(10, 22, string1, 15);
+
+
 
         return true;
     }

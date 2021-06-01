@@ -13,17 +13,8 @@ private:
     int lifes;
     Pocisk* pociskgracz;
 public:
-    Statek()
-    {
-        this->playerx1 = 59.0f;
-        this->playery1 = 65.0f;
-        this->playerx2 = 56.0f;
-        this->playery2 = 68.0f;
-        this->playerx3 = 62.0f;
-        this->playery3 = 68.0f;
-        this->lifes = 3;
-        this->pociskgracz = new Pocisk;
-    }
+    Statek();
+    ~Statek();
 
     void Move_left(float fElapsedTime);
     void Move_right(float fElapsedTime);

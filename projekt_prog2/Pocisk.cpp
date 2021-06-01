@@ -9,7 +9,7 @@ void Pocisk::Move_up(float fElapsedTime)
 void Pocisk::Move_down(float fElapsedTime)
 {
     this->up = false;
-    if (this->up == false) this->pocisky += 50.0f * fElapsedTime;
+    if (this->up == false && this->pocisky < 69.0f) this->pocisky += 50.0f * fElapsedTime;
 }
 
 float Pocisk::Pociskx() { return this->pociskx; }

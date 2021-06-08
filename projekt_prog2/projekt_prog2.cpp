@@ -64,7 +64,7 @@ public:
         cp2 = chrono::system_clock::now();
         elaps = elaps + (cp2 - cp1);
         cp1 = cp2;
-        if (elaps.count() > 6) elaps = elaps.zero();
+        if (elaps.count() > 5) elaps = elaps.zero();
         float elaps2 = elaps.count();
         
 
@@ -174,10 +174,17 @@ public:
         }
         //-------------------------------------------
 
+        //Kolizja pocisku ze statkiem
+        for (int which = 0; which < ile; which++)
+        {
+
+        }
+        //-------------------------------------------
+
         //Kosmici dochodza do poziomu gracza
         for (int which = 0; which < ile; which++)
         {
-            if (kosmita[which]->Kosmitay(3) >= ship->Playery1() && kosmita[which]->Shootable() == true)
+            if (kosmita[which]->Kosmitay(3) >= ship->Playery1() || kosmita[which]->Kosmitay(2) >= ship->Playery1() && kosmita[which]->Shootable() == true)
             {
                 ship->Life_minus();
                 for (int ktory = 0; ktory < ile; ktory++)
@@ -274,10 +281,10 @@ public:
         
 
         //Pomoc przy kolizji
-        string1 = to_wstring(elaps2);
+        /*string1 = to_wstring(elaps2);
         DrawString(10, 21, string1, 15);
         string1 = to_wstring(kosmita[0]->Pocisky());
-        DrawString(10, 22, string1, 15);
+        DrawString(10, 22, string1, 15);*/
 
 
 

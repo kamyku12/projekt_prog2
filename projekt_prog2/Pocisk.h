@@ -6,12 +6,7 @@ private:
     float pocisky, pociskx;
     bool up;
 public:
-    Pocisk()
-    {
-        this->pocisky = 0.0f;
-        this->pociskx = 0.0f;
-        this->up = true;
-    }
+    Pocisk();
 
     void Move_up(float fElapsedTime);
     void Move_down(float fElapsedTime);

@@ -1,27 +1,29 @@
 #pragma once
 #include "Pocisk.h"
+#include <cstdlib>
+#include <vector>
 
 class Kosmita : public Pocisk
 {
 private:
-    float* x, * y, * pomx, * pomy;
+    std::vector<float> x, y, pomx, pomy;
     wchar_t znak, znak_srodek, znak_pocz;
     int color, color_srodek, szerokosc, wysokosc, strzelic;
-    bool shootable, kosmwystrzelony;
-    wchar_t znaki[5] = { 'M','O','W','A','R' };
-    Pocisk* pociskkosmita;
+    bool shootable, kosmwystrzelony, ruchwlewo;
+    std::vector<wchar_t> znaki = { 'M','O','W','A','R' };
+    Pocisk* pocisk_kosmita;
 public:
-    Kosmita(int lp, char znaczek, int freq);
+    Kosmita(int lp, int znaczek, int freq);
     ~Kosmita();
 
     float Kosmitax(int which);
     int Szerokosc();
     float Kosmitay(int which);
     float Wysokosc();
-    wchar_t Kosmitaznak();
-    wchar_t Kosmitaznak_sr();
-    int Kosmitacolor();
-    int Kosmitacolor_sr();
+    wchar_t Kosmita_znak();
+    wchar_t Kosmita_znak_sr();
+    int Kosmita_color();
+    int Kosmita_color_sr();
     bool Shootable();
     bool Shoot(int czas);
     bool wystrzelony();
@@ -30,14 +32,15 @@ public:
 
 
     void wystrzelony(bool l);
-    void Kosmitaznak(char znak);
-    void Kosmitacolor(int color);
+    void Kosmita_znak(char znak);
+    void Kosmita_color(int color);
     void Shootable_zmien();
+    void Ruch_w_lewo(bool wlewo);
 
     void Kosmita_poczatek();
 
     void Kosmitay_wdol(float where);
 
-    void Move(float fElapsedTime, bool left, int level);
+    void Move(float fElapsedTime, int level);
 };
 

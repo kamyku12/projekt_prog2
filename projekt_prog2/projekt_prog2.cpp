@@ -4,22 +4,20 @@
 #include "Statek.h"
 #include "Kosmita.h"
 #include "Pocisk.h"
-
-using namespace std;
+#include <vector>
 
 
 class Gra : public olcConsoleGameEngine
 {
 private:
     Statek* ship;
-    bool wystrzelony, ruchwlewo;
-    Kosmita *kosmita[12];
+    std::vector<Kosmita> kosmici;
+    //Kosmita *kosmici[12];
     int score, ile;
-    wstring wscore, wlevel, wzycia ,string1;
-    char znaki_kosmita[5] = { 'M','O','W','A','R' };
+    std::wstring wscore, wlevel, wzycia ,string1;
     int randomowa, randomowa2, level, trafionych;
-    chrono::duration<float> elaps;
-    chrono::system_clock::time_point cp1, cp2;
+    std::chrono::duration<float> elaps;
+    std::chrono::system_clock::time_point cp1, cp2;
 public:
     Gra()
     {
@@ -29,10 +27,8 @@ public:
         {
             randomowa = rand() % 5 + 0;
             randomowa2 = rand() % 5 + 1;
-            kosmita[i] = new Kosmita(i, znaki_kosmita[randomowa], randomowa2);
+            kosmici.push_back(Kosmita(i, randomowa, randomowa2));
         }
-        ruchwlewo = true;
-        wystrzelony = false;
         ship = new Statek;
         score = 0;
         level = 1;
@@ -40,31 +36,28 @@ public:
         wlevel = L"Level: ";
         wzycia = L"Lifes: ";
         trafionych = 0;
-        cp1 = chrono::system_clock::now();
-        cp2 = chrono::system_clock::now();
+        cp1 = std::chrono::system_clock::now();
+        cp2 = std::chrono::system_clock::now();
     }
 
     ~Gra()
     {
         delete ship;
-        for (int i = 0; i < 12; i++)
-            delete kosmita[i];
+        kosmici.clear();
     }
 
     bool OnUserCreate()
     {
-        
-        
         return true;
     }
 
     bool OnUserUpdate(float fElapsedTime)
     {
         //Zliczenie ile czasu trwa gra, glownie uzywany do wystrzalu kosmity
-        cp2 = chrono::system_clock::now();
+        cp2 = std::chrono::system_clock::now();
         elaps = elaps + (cp2 - cp1);
         cp1 = cp2;
-        if (elaps.count() > 5) elaps = elaps.zero();
+        if (elaps.count() > 5.5) elaps = elaps.zero();
         float elaps2 = elaps.count();
         
 
@@ -95,116 +88,132 @@ public:
 
         //level, zycia, score
         DrawString(105, 2, wscore, 15);
-        DrawString(113, 2, to_wstring(score), 15);
+        DrawString(113, 2, std::to_wstring(score), 15);
 
         DrawString(105, 4, wlevel, 15);
-        DrawString(112, 4, to_wstring(level), 15);
+        DrawString(112, 4, std::to_wstring(level), 15);
 
         DrawString(105, 6, wzycia, 15);
-        DrawString(112, 6, to_wstring(ship->Lifes()), 15);
+        DrawString(112, 6, std::to_wstring(ship->Lifes()), 15);
         //-------------------------------------------
 
 
         //Rysowanie statku
-        DrawTriangle(ship->Playerx1(), ship->Playery1(), ship->Playerx2(), ship->Playery2(), ship->Playerx3(), ship->Playery3(), L'#', 14);
-        FillTriangle(ship->Playerx1(), ship->Playery1(), ship->Playerx2(), ship->Playery2(), ship->Playerx3(), ship->Playery3(), L'#', 14);
+        DrawTriangle(ship->Playerx(1), ship->Playery(1), ship->Playerx(2), ship->Playery(2), ship->Playerx(3), ship->Playery(3), L'#', 14);
+        FillTriangle(ship->Playerx(1), ship->Playery(1), ship->Playerx(2), ship->Playery(2), ship->Playerx(3), ship->Playery(3), L'#', 14);
         //-------------------------------------------
 
         
 
         //Rysowanie Kosmity
-        for (int which = 0; which < ile; which++)
+        for (int which = 0; which < kosmici.size(); which++)
         {
-            for (int x = 0; x < kosmita[which]->Szerokosc(); x++)
-                for (int y = 0; y < kosmita[which]->Wysokosc(); y++)
-                    if ((x >= 1 && x <= 3) && (y >=1 && y <= 3)) Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), kosmita[which]->Kosmitaznak_sr(), kosmita[which]->Kosmitacolor_sr());
-                    else Draw(kosmita[which]->Kosmitax(x), kosmita[which]->Kosmitay(y), kosmita[which]->Kosmitaznak(), kosmita[which]->Kosmitacolor());
+            for (int x = 0; x < kosmici[which].Szerokosc(); x++)
+                for (int y = 0; y < kosmici[which].Wysokosc(); y++)
+                    if ((x >= 1 && x <= 3) && (y >=1 && y <= 3)) Draw(kosmici[which].Kosmitax(x), kosmici[which].Kosmitay(y), kosmici[which].Kosmita_znak_sr(), kosmici[which].Kosmita_color_sr());
+                    else Draw(kosmici[which].Kosmitax(x), kosmici[which].Kosmitay(y), kosmici[which].Kosmita_znak(), kosmici[which].Kosmita_color());
 
         }
         //-------------------------------------------
         
         //Ruch Kosmity
-        for (int which = 0; which < ile; which++)
+        for (int which = 0; which < kosmici.size(); which++)
         {
-           kosmita[which]->Move(fElapsedTime, ruchwlewo, level);
+            kosmici[which].Move(fElapsedTime, level);
         }
         
-        for(int which = 0; which < ile; which++)
-        if (kosmita[which]->Kosmitax(0) < 1.5f && kosmita[which]->Shootable() == true)
+        for(int which = 0; which < kosmici.size(); which++)
+        if (kosmici[which].Kosmitax(0) < 1.5f && kosmici[which].Shootable() == true)
         {
-            for (int i = 0; i < ile; i++)
-                    kosmita[i]->Kosmitay_wdol(1.0f);
-
-            ruchwlewo = false;
+            for (int ktory = 0; ktory < kosmici.size(); ktory++)
+            {
+                kosmici[ktory].Kosmitay_wdol(1.0f);
+                kosmici[ktory].Ruch_w_lewo(false);
+            }
         }
         
-        for (int which = 0; which < ile; which++)
-        if (kosmita[which]->Kosmitax(3) > 118.0f && kosmita[which]->Shootable() == true)
+        for (int which = 0; which < kosmici.size(); which++)
+        if (kosmici[which].Kosmitax(3) > 118.0f && kosmici[which].Shootable() == true)
         {
-            for (int i = 0; i < ile; i++)
-                    kosmita[i]->Kosmitay_wdol(1.0f);
-
-            ruchwlewo = true;
+            for (int ktory = 0; ktory < kosmici.size(); ktory++)
+            {
+                    kosmici[ktory].Kosmitay_wdol(1.0f);
+                    kosmici[ktory].Ruch_w_lewo(true);
+            }
         }
         //-------------------------------------------
 
 
         //Kolizja pocisku z kosmita
-        for (int which = 0; which < ile; which++)
+        for (int which = 0; which < kosmici.size(); which++)
         {
-                    if ((ship->Pociskx() >= kosmita[which]->Kosmitax(0) - 1.0f && ship->Pociskx() <= kosmita[which]->Kosmitax(4)+ 1.0f ) && (ship->Pocisky() >= kosmita[which]->Kosmitay(0)+ 1.0f && ship->Pocisky() <= kosmita[which]->Kosmitay(4)+ 1.0f ) && kosmita[which]->Shootable() == true)
+                    if ((ship->Pociskx() >= kosmici[which].Kosmitax(0) - 1.0f && ship->Pociskx() <= kosmici[which].Kosmitax(4)+ 1.0f ) && (ship->Pocisky() >= kosmici[which].Kosmitay(0)+ 1.0f && ship->Pocisky() <= kosmici[which].Kosmitay(4)+ 1.0f ) && kosmici[which].Shootable() == true)
                     {
                         ship->Pocisky(0.0f);
-                        wystrzelony = false;
-                        kosmita[which]->Kosmitaznak(NULL);
-                        kosmita[which]->Kosmitacolor(NULL);
-                        kosmita[which]->Shootable_zmien();
-                        score += 100;
+                        ship->Wystrzelony(false);
+                        kosmici[which].Kosmita_znak(NULL);
+                        kosmici[which].Kosmita_color(NULL);
+                        kosmici[which].Shootable_zmien();
+                        if (kosmici[which].Kosmita_znak() == L'A') score += 100;
                         trafionych++;
                     }
-                    if (trafionych == ile)
+                    if (trafionych == kosmici.size())
                     {
-                        for (int ktory = 0; ktory < ile; ktory++)
-                            kosmita[ktory]->Kosmita_poczatek();
-                        
+                        for (int ktory = 0; ktory < kosmici.size(); ktory++)
+                        {
+
+                            kosmici[ktory].Kosmita_poczatek();
+                            kosmici[ktory].Ruch_w_lewo(true);
+                        }
                         trafionych = 0; 
-                        ruchwlewo = true;
                         level++;
                     }
         }
         //-------------------------------------------
 
         //Kolizja pocisku ze statkiem
-        for (int which = 0; which < ile; which++)
+        for (int which = 0; which < kosmici.size(); which++)
         {
-
+            if (kosmici[which].Pociskx() >= ship->Playerx(2) - 0.5f && kosmici[which].Pociskx() <= ship->Playerx(3) + 0.5f && kosmici[which].Pocisky() >= ship->Playery(1))
+            {
+                kosmici[which].Pociskx(kosmici[which].Kosmitax(2));
+                kosmici[which].Pocisky(kosmici[which].Kosmitay(2));
+                ship->Life_minus();
+                for (int ktory = 0; ktory < kosmici.size(); ktory++)
+                {
+                    kosmici[ktory].Kosmita_poczatek();
+                    kosmici[ktory].Ruch_w_lewo(true);
+                }
+                trafionych = 0;
+            }
         }
         //-------------------------------------------
 
         //Kosmici dochodza do poziomu gracza
-        for (int which = 0; which < ile; which++)
+        for (int which = 0; which < kosmici.size(); which++)
         {
-            if (kosmita[which]->Kosmitay(3) >= ship->Playery1() || kosmita[which]->Kosmitay(2) >= ship->Playery1() && kosmita[which]->Shootable() == true)
+            if (kosmici[which].Kosmitay(3) >= ship->Playery(1) || kosmici[which].Kosmitay(2) >= ship->Playery(1) && kosmici[which].Shootable() == true)
             {
                 ship->Life_minus();
-                for (int ktory = 0; ktory < ile; ktory++)
-                    kosmita[ktory]->Kosmita_poczatek();
-
+                for (int ktory = 0; ktory < kosmici.size(); ktory++)
+                {
+                    kosmici[ktory].Kosmita_poczatek();
+                    kosmici[ktory].Ruch_w_lewo(true);
+                }
                 trafionych = 0;
-                ruchwlewo = true;
             }
         }
         //-------------------------------------------
 
         //Rysowanie pocisku, ruch pocisku
-        if (m_keys[VK_SPACE].bPressed && wystrzelony == false)
+        if (m_keys[VK_SPACE].bPressed && ship->Wystrzelony() == false)
         {
-            wystrzelony = true;
-            ship->Pociskx(ship->Playerx1());
-            ship->Pocisky(ship->Playery1() - 1);
+            ship->Wystrzelony(true);
+            ship->Pociskx(ship->Playerx(1));
+            ship->Pocisky(ship->Playery(1) - 1);
         }
 
-        if (wystrzelony == true)
+        if (ship->Wystrzelony() == true)
         {
 
             Draw(ship->Pociskx(), ship->Pocisky(), L'O', 15);
@@ -212,33 +221,42 @@ public:
             if (ship->Pocisky() <= 2.0f || (ship->Pociskx() >= 100.0f && ship->Pocisky() <= 10.0f))
             {
                 ship->Pocisky(0.0f);
-                ship->Pociskx(ship->Playerx1());
-                wystrzelony = false;
+                ship->Pociskx(ship->Playerx(1));
+                ship->Wystrzelony(false);
             }
         }
         //-------------------------------------------
         
         //Wystrzal kosmity
-        for (int which = 0; which < ile; which++)
+        for (int which = 0; which < kosmici.size(); which++)
         {
-            if (kosmita[which]->Shootable() == true && kosmita[which]->Shoot(elaps2) && kosmita[which]->wystrzelony() == false)
+            //Strzelanie kosmitow z gornego rzedu
+            if(which <= 5 && kosmici[which].Kosmitay(4) + 5 != kosmici[which + 6].Kosmitay(0) && kosmici[which+6].Shootable() == false && kosmici[which].Shootable() == true && kosmici[which].Shoot(elaps2) && kosmici[which].wystrzelony() == false)
             {
-                kosmita[which]->wystrzelony(true);
-                kosmita[which]->Pociskx(kosmita[which]->Kosmitax(2));
-                kosmita[which]->Pocisky(kosmita[which]->Kosmitay(2));
+                kosmici[which].wystrzelony(true);
+                kosmici[which].Pociskx(kosmici[which].Kosmitax(2));
+                kosmici[which].Pocisky(kosmici[which].Kosmitay(4)+1);
+            }
+            
+            //Strzelanie kosmitow z dolnego rzedu (nie musza sprawdzac czy ktos jest pod nimi)
+            if (which > 5 && kosmici[which].Shootable() == true && kosmici[which].Shoot(elaps2) && kosmici[which].wystrzelony() == false)
+            {
+                kosmici[which].wystrzelony(true);
+                kosmici[which].Pociskx(kosmici[which].Kosmitax(2));
+                kosmici[which].Pocisky(kosmici[which].Kosmitay(4)+1);
             }
         }
-        for (int which = 0; which < ile; which++)
+        for (int which = 0; which < kosmici.size(); which++)
         {
-            if (kosmita[which]->wystrzelony() == true)
+            if (kosmici[which].wystrzelony() == true)
             {
-                Draw(kosmita[which]->Pociskx(), kosmita[which]->Pocisky(), L'O', 5);
-                kosmita[which]->Move_down(fElapsedTime/2);
-                if (kosmita[which]->Pocisky() >= 69.0f)
+                Draw(kosmici[which].Pociskx(), kosmici[which].Pocisky(), L'O', 5);
+                kosmici[which].Move_down(fElapsedTime/2);
+                if (kosmici[which].Pocisky() >= 69.0f)
                 {
-                    kosmita[which]->wystrzelony(false);
-                    kosmita[which]->Pociskx(kosmita[which]->Kosmitax(2));
-                    kosmita[which]->Pocisky(kosmita[which]->Kosmitay(2));
+                    kosmici[which].wystrzelony(false);
+                    kosmici[which].Pociskx(kosmici[which].Kosmitax(2));
+                    kosmici[which].Pocisky(kosmici[which].Kosmitay(4)+1);
                     
                 }
             }
@@ -258,7 +276,7 @@ public:
                 for (int j = 0; j < 120; j++)
                     Draw(j, i, L' ', 0);
 
-            DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2, L"Przegrałeś, nacisnij dowolny przycisk aby zakonczyc", 15);
+            DrawString(m_nScreenWidth / 2 - 26, m_nScreenHeight / 2, L"Przegrałeś, nacisnij dowolny przycisk aby zakonczyc", 15);
 
             return false;
         }
@@ -272,21 +290,17 @@ public:
 
             DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2, L"Gratulacje, wygrałeś", 15);
             DrawString(m_nScreenWidth / 2 - 17 + 1, m_nScreenHeight / 2 + 1, L"Zdobyte punkty: ", 15);
-            DrawString(m_nScreenWidth / 2 + 1, m_nScreenHeight / 2 + 1, to_wstring(score), 15);
+            DrawString(m_nScreenWidth / 2 + 1, m_nScreenHeight / 2 + 1, std::to_wstring(score), 15);
             DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2 + 2, L"Nacisnij dowolny przycisk aby zakończyć", 15);
 
             return false;
         }
-
-        
 
         //Pomoc przy kolizji
         /*string1 = to_wstring(elaps2);
         DrawString(10, 21, string1, 15);
         string1 = to_wstring(kosmita[0]->Pocisky());
         DrawString(10, 22, string1, 15);*/
-
-
 
         return true;
     }
@@ -297,9 +311,9 @@ public:
 
 int main()
 {
-    Gra gierka;
-    gierka.ConstructConsole(120, 70, 10, 10);
-    gierka.Start();
+    Gra Invaders;
+    Invaders.ConstructConsole(120, 70, 10, 10);
+    Invaders.Start();
 
     getchar();
     return 0;

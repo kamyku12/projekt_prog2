@@ -1,5 +1,12 @@
 #include "Pocisk.h"
 
+Pocisk::Pocisk()
+{
+    this->pocisky = 0.0f;
+    this->pociskx = 0.0f;
+    this->up = true;
+}
+
 void Pocisk::Move_up(float fElapsedTime)
 {
     this->up = true;

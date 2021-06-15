@@ -1,16 +1,14 @@
 #pragma once
 #include "Pocisk.h"
+#include <vector>
+#include <cstdlib>
 
 class Statek :public Pocisk
 {
 private:
-    float playerx1;
-    float playery1;
-    float playerx2;
-    float playery2;
-    float playerx3;
-    float playery3;
+    std::vector<float> playerx, playery;
     int lifes;
+    bool wystrzelony;
     Pocisk* pociskgracz;
 public:
     Statek();
@@ -19,12 +17,10 @@ public:
     void Move_left(float fElapsedTime);
     void Move_right(float fElapsedTime);
     void Life_minus();
+    void Wystrzelony(bool wystrzelony);
 
     int Lifes();
-    float Playerx1();
-    float Playerx2();
-    float Playerx3();
-    float Playery1();
-    float Playery2();
-    float Playery3();
+    float Playerx(int which);
+    float Playery(int which);
+    bool Wystrzelony();
 };

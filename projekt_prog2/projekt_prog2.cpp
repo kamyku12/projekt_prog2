@@ -12,9 +12,8 @@ class Gra : public olcConsoleGameEngine
 private:
     Statek* ship;
     std::vector<Kosmita> kosmici;
-    //Kosmita *kosmici[12];
     int score, ile;
-    std::wstring wscore, wlevel, wzycia ,string1;
+    std::wstring w_score, w_level, w_zycia, string1;
     int randomowa, randomowa2, level, trafionych;
     std::chrono::duration<float> elaps;
     std::chrono::system_clock::time_point cp1, cp2;
@@ -32,9 +31,9 @@ public:
         ship = new Statek;
         score = 0;
         level = 1;
-        wscore = L"Score: ";
-        wlevel = L"Level: ";
-        wzycia = L"Lifes: ";
+        w_score = L"Score: ";
+        w_level = L"Level: ";
+        w_zycia = L"Lifes: ";
         trafionych = 0;
         cp1 = std::chrono::system_clock::now();
         cp2 = std::chrono::system_clock::now();
@@ -87,13 +86,13 @@ public:
         //-------------------------------------------
 
         //level, zycia, score
-        DrawString(105, 2, wscore, 15);
+        DrawString(105, 2, w_score, 15);
         DrawString(113, 2, std::to_wstring(score), 15);
 
-        DrawString(105, 4, wlevel, 15);
+        DrawString(105, 4, w_level, 15);
         DrawString(112, 4, std::to_wstring(level), 15);
 
-        DrawString(105, 6, wzycia, 15);
+        DrawString(105, 6, w_zycia, 15);
         DrawString(112, 6, std::to_wstring(ship->Lifes()), 15);
         //-------------------------------------------
 
@@ -154,17 +153,14 @@ public:
                         kosmici[which].Kosmita_znak(NULL);
                         kosmici[which].Kosmita_color(NULL);
                         kosmici[which].Shootable_zmien();
-                        if (kosmici[which].Kosmita_znak() == L'A') score += 100;
+                        score += 100;
                         trafionych++;
                     }
                     if (trafionych == kosmici.size())
                     {
                         for (int ktory = 0; ktory < kosmici.size(); ktory++)
-                        {
-
                             kosmici[ktory].Kosmita_poczatek();
-                            kosmici[ktory].Ruch_w_lewo(true);
-                        }
+
                         trafionych = 0; 
                         level++;
                     }
@@ -174,16 +170,14 @@ public:
         //Kolizja pocisku ze statkiem
         for (int which = 0; which < kosmici.size(); which++)
         {
-            if (kosmici[which].Pociskx() >= ship->Playerx(2) - 0.5f && kosmici[which].Pociskx() <= ship->Playerx(3) + 0.5f && kosmici[which].Pocisky() >= ship->Playery(1))
+            if (kosmici[which].Pociskx() >= ship->Playerx(2) && kosmici[which].Pociskx() <= ship->Playerx(3) && kosmici[which].Pocisky() >= ship->Playery(1))
             {
                 kosmici[which].Pociskx(kosmici[which].Kosmitax(2));
                 kosmici[which].Pocisky(kosmici[which].Kosmitay(2));
                 ship->Life_minus();
                 for (int ktory = 0; ktory < kosmici.size(); ktory++)
-                {
                     kosmici[ktory].Kosmita_poczatek();
-                    kosmici[ktory].Ruch_w_lewo(true);
-                }
+
                 trafionych = 0;
             }
         }
@@ -196,10 +190,8 @@ public:
             {
                 ship->Life_minus();
                 for (int ktory = 0; ktory < kosmici.size(); ktory++)
-                {
                     kosmici[ktory].Kosmita_poczatek();
-                    kosmici[ktory].Ruch_w_lewo(true);
-                }
+
                 trafionych = 0;
             }
         }
@@ -289,8 +281,8 @@ public:
                     Draw(j, i, L' ', 0);
 
             DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2, L"Gratulacje, wygrałeś", 15);
-            DrawString(m_nScreenWidth / 2 - 17 + 1, m_nScreenHeight / 2 + 1, L"Zdobyte punkty: ", 15);
-            DrawString(m_nScreenWidth / 2 + 1, m_nScreenHeight / 2 + 1, std::to_wstring(score), 15);
+            DrawString(m_nScreenWidth / 2 - 17 + 16, m_nScreenHeight / 2 + 1, L"Zdobyte punkty: ", 15);
+            DrawString(m_nScreenWidth / 2 + 16, m_nScreenHeight / 2 + 1, std::to_wstring(score), 15);
             DrawString(m_nScreenWidth / 2 - 17, m_nScreenHeight / 2 + 2, L"Nacisnij dowolny przycisk aby zakończyć", 15);
 
             return false;
@@ -311,10 +303,11 @@ public:
 
 int main()
 {
-    Gra Invaders;
-    Invaders.ConstructConsole(120, 70, 10, 10);
-    Invaders.Start();
+    Gra *Invaders = new Gra;
+    Invaders->ConstructConsole(120, 70, 10, 10);
+    Invaders->Start();
 
     getchar();
+    delete Invaders;
     return 0;
 }

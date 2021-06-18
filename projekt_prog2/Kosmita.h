@@ -11,7 +11,7 @@ private:
     int color, color_srodek, szerokosc, wysokosc, strzelic;
     bool shootable, kosmwystrzelony, ruchwlewo;
     std::vector<wchar_t> znaki = { 'M','O','W','A','R' };
-    Pocisk* pocisk_kosmita;
+    Pocisk pocisk_kosmita;
 public:
     Kosmita(int lp, int znaczek, int freq);
     ~Kosmita();
@@ -43,4 +43,3 @@ public:
 
     void Move(float fElapsedTime, int level);
 };
-

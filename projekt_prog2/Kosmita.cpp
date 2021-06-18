@@ -13,7 +13,6 @@ Kosmita::Kosmita(int lp, int znaczek, int freq)
     this->color = 164;
     this->color_srodek = 240;
     this->shootable = true;
-    this->pocisk_kosmita = new Pocisk;
     this->strzelic = freq;
     this->kosmwystrzelony = false;
     this->ruchwlewo = true;
@@ -100,6 +99,7 @@ void Kosmita::Kosmita_poczatek()
     this->Pocisky(this->Kosmitay(0));
 
     this->kosmwystrzelony = false;
+    this->ruchwlewo = true;
 }
 
 void Kosmita::Kosmitay_wdol(float where)
@@ -113,12 +113,12 @@ void Kosmita::Move(float fElapsedTime, int level)
     if (ruchwlewo)
     {
         for (int i = 0; i < this->szerokosc; i++)
-            this->x[i] -= 15.0f * (1 + 0.20*(level-1)) * fElapsedTime;
+            this->x[i] -= 20.0f * (1 + 0.20*(level-1)) * fElapsedTime;
     }
     else
     {
         for (int i = 0; i < this->szerokosc; i++)
-            this->x[i] += 15.0f * (1 + 0.20 * (level - 1)) * fElapsedTime;
+            this->x[i] += 20.0f * (1 + 0.20 * (level - 1)) * fElapsedTime;
     }
 }
 
